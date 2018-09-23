@@ -20,7 +20,6 @@ public:
     ~Triangle();
 
     void vertexArrayID();
-
     void genVertexBuffer();
 
     void draw();
@@ -28,15 +27,20 @@ public:
 
     void shader();
 
+    void createUniform(std::string name);
+    void setUniform(std::string name, glm::mat4 mat4);
+
 private:
 
-    GLuint _vertexArrayID;
+    std::string getDataFile(const std::string& filename);
 
+    GLuint _vertexArrayID;
     // This will identify our vertex buffer
     GLuint _vertexbuffer;
-
     GLuint _programID;
 
+    ShaderProgram* _shader;
+    
     // An array of 3 vectors which represents 3 vertices
     const GLfloat g_vertex_buffer_data[3 * 3] = {
         -1.0f, -1.0f, 0.0f,

@@ -2,14 +2,14 @@
 
 
 Triangle::Triangle() {
-    ;
+    _shader = new ShaderProgram();
 }
 
 Triangle::~Triangle() {
     ;
 }
 
-std::string getDataFile(const std::string& filename)
+std::string Triangle::getDataFile(const std::string& filename)
 {
    std::ifstream file(filename);
 
@@ -40,15 +40,21 @@ void Triangle::genVertexBuffer()
 }
 
 
+void Triangle::createUniform(std::string name) {
+    _shader->createUniform(name);
+}
+
+void Triangle::setUniform(std::string name, glm::mat4 mat4) {
+    _shader->setUniform(name, mat4);
+}
+
 void Triangle::shader()
 {
-    ShaderProgram* shader = new ShaderProgram();
+    _shader->createVertexShader(getDataFile("./Glitter/GLSL/triangle/vertex.glsl"));
+    _shader->createFragmentShader(getDataFile("./Glitter/GLSL/triangle/fragment.glsl"));
+    _shader->link();
 
-    shader->createVertexShader(getDataFile("./Glitter/GLSL/triangle/triangle_vertex.glsl"));
-    shader->createFragmentShader(getDataFile("./Glitter/GLSL/triangle/triangle_fragment.glsl"));
-    shader->link();
-
-    _programID = shader->getProgramId();
+    _programID = _shader->getProgramId();
 }
 
 

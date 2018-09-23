@@ -27,12 +27,14 @@ file(GLOB PROJECT_HEADERS
     Glitter/Sources/ShaderProgram.hpp
     Glitter/Sources/Cube.hpp
     Glitter/Sources/Triangle.hpp
+    Glitter/Sources/Camera.hpp
 )
 
 file(GLOB PROJECT_SOURCES
     Glitter/Sources/ShaderProgram.cpp
     Glitter/Sources/Cube.cpp
     Glitter/Sources/Triangle.cpp
+    Glitter/Sources/Camera.cpp
     Glitter/Sources/main.cpp
 )
 

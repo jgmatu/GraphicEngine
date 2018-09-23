@@ -18,6 +18,7 @@
 
 #include "Triangle.hpp"
 #include "Cube.hpp"
+#include "Camera.hpp"
 
 GLFWwindow* window;
 
@@ -67,8 +68,7 @@ init()
 void
 loop()
 {
-    glEnable(GL_DEPTH_TEST);
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    Camera *camera = new Camera();
 
     Triangle *triangle = new Triangle();
 
@@ -76,12 +76,29 @@ loop()
     triangle->genVertexBuffer();
     triangle->shader();
 
+    triangle->createUniform("projection");
+    triangle->createUniform("view");
+    triangle->createUniform("model");
+
+    glEnable(GL_DEPTH_TEST);
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     do {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        triangle->bind();
-        triangle->draw();
+        for (int i = -3; i < 4; ++i) {
+            for (int j = -2; j < 3; ++j) {
+                triangle->draw();
+                triangle->bind();
 
+                glm::mat4 model(1.0);
+                model = glm::scale(model, glm::vec3(0.5, 0.5, 0.5));
+                model = glm::translate(model, glm::vec3(i * 2, j * 2, 0));
+
+                triangle->setUniform("projection", camera->_projection);
+                triangle->setUniform("view", camera->_view);
+                triangle->setUniform("model", model);
+            }
+        }
         // Poll for window events. The key callback above will only be
         // invoked during this call.
         glfwPollEvents();
