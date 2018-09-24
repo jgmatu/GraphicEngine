@@ -3,6 +3,7 @@
 
 Triangle::Triangle() {
     _shader = new ShaderProgram();
+    _model = glm::mat4(1);
 }
 
 Triangle::~Triangle() {
@@ -77,4 +78,16 @@ void Triangle::draw() {
 
 void Triangle::bind()  {
     glUseProgram(_programID);
+}
+
+void Triangle::identity() {
+    _model = glm::mat4(1.0);
+}
+
+void Triangle::translate(glm::vec3 vec3) {
+    _model = glm::translate(_model, vec3);
+}
+
+void Triangle::scale(glm::vec3 vec3) {
+    _model = glm::scale(_model, vec3);
 }

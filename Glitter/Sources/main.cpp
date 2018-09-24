@@ -14,7 +14,6 @@
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/gtx/transform.hpp> // after <glm/glm.hpp>
-#include <stb_image.h>
 
 #include "Triangle.hpp"
 #include "Cube.hpp"
@@ -70,39 +69,51 @@ loop()
 {
     Camera *camera = new Camera();
 
-    Triangle *triangle = new Triangle();
+    Cube *cube = new Cube();
 
-    triangle->vertexArrayID();
-    triangle->genVertexBuffer();
-    triangle->shader();
+    cube->vertexArrayID();
+    cube->genVertexBuffer();
+    cube->shader();
 
-    triangle->createUniform("projection");
-    triangle->createUniform("view");
-    triangle->createUniform("model");
+    cube->createUniform("projection");
+    cube->createUniform("view");
+    cube->createUniform("model");
+
+    cube->createUniform("diffuseTexture");
+    cube->loadTexutre("./textura.png");
 
     glEnable(GL_DEPTH_TEST);
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    GLint64 timer;
     do {
+        glGetInteger64v(GL_TIMESTAMP, &timer);
+        float angle = std::fmod((timer / 1000000000.0), (2.0f * M_PI));
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        for (int i = -3; i < 4; ++i) {
+        for (int i = -2; i < 3; ++i) {
+
             for (int j = -2; j < 3; ++j) {
-                triangle->draw();
-                triangle->bind();
+                cube->translate(glm::vec3(i * 3.5 , j * 3.5, 0.0));
+                cube->rotate(angle, glm::vec3(1.0f, -1.0f, 0.0f));
 
-                glm::mat4 model(1.0);
-                model = glm::scale(model, glm::vec3(0.5, 0.5, 0.5));
-                model = glm::translate(model, glm::vec3(i * 2, j * 2, 0));
+                cube->setUniform("projection", camera->_projection);
+                cube->setUniform("view", camera->_view);
+                cube->setUniform("model", cube->_model);
+                cube->setUniform("diffuseTexture", 0); // El índice es el mismo que en glActiveTexture()
 
-                triangle->setUniform("projection", camera->_projection);
-                triangle->setUniform("view", camera->_view);
-                triangle->setUniform("model", model);
+                // Render...
+                cube->bind();
+                cube->texture();
+                cube->draw();
+                cube->identity();
             }
         }
+
         // Poll for window events. The key callback above will only be
         // invoked during this call.
         glfwPollEvents();
         glfwSwapBuffers(window); // swap the color buffers.
+
     } while (!glfwWindowShouldClose(window));
 }
 

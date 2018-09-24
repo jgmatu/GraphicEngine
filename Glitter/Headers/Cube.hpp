@@ -11,70 +11,46 @@
 #include <glm/gtx/transform.hpp> // after <glm/glm.hpp>
 
 #include "ShaderProgram.hpp"
+#include "BOX.h"
 
 class Cube {
-  public:
+public:
 
-      Cube();
-      ~Cube();
+    Cube();
+    ~Cube();
 
-      void vertexArrayID();
-      void genVertexBuffer();
+    void vertexArrayID();
+    void genVertexBuffer();
 
-      void draw();
-      void bind();
+    void draw();
+    void bind();
 
-      void shader();
+    void shader();
 
-  private:
+    void createUniform(std::string name);
+    void setUniform(std::string name, glm::mat4 mat4);
+    void setUniform(std::string name, int value);
 
-      std::string getDataFile(const std::string& filename);
+    void identity();
+    void translate(glm::vec3 vec3);
+    void scale(glm::vec3 vec3);
+    void rotate(float angle, glm::vec3 direction);
+    void texture();
+    void loadTexutre(const char *texture);
 
-      GLuint _vertexArrayID;
-      // This will identify our vertex buffer
-      GLuint _vertexbuffer;
-      GLuint _programID;
+    glm::mat4 _model;
 
-    // Our vertices. Three consecutive floats give a 3D vertex; Three consecutive vertices give a triangle.
-    // A cube has 6 faces with 2 triangles each, so this makes 6*2=12 triangles, and 12*3 vertices
-    const GLfloat g_vertex_buffer_data[12 * 3 * 3] = {
-        -1.0f,-1.0f,-1.0f, // triangle 1 : begin
-        -1.0f,-1.0f, 1.0f,
-        -1.0f, 1.0f, 1.0f, // triangle 1 : end
-        1.0f, 1.0f,-1.0f, // triangle 2 : begin
-        -1.0f,-1.0f,-1.0f,
-        -1.0f, 1.0f,-1.0f, // triangle 2 : end
-        1.0f,-1.0f, 1.0f,
-        -1.0f,-1.0f,-1.0f,
-        1.0f,-1.0f,-1.0f,
-        1.0f, 1.0f,-1.0f,
-        1.0f,-1.0f,-1.0f,
-        -1.0f,-1.0f,-1.0f,
-        -1.0f,-1.0f,-1.0f,
-        -1.0f, 1.0f, 1.0f,
-        -1.0f, 1.0f,-1.0f,
-        1.0f,-1.0f, 1.0f,
-        -1.0f,-1.0f, 1.0f,
-        -1.0f,-1.0f,-1.0f,
-        -1.0f, 1.0f, 1.0f,
-        -1.0f,-1.0f, 1.0f,
-        1.0f,-1.0f, 1.0f,
-        1.0f, 1.0f, 1.0f,
-        1.0f,-1.0f,-1.0f,
-        1.0f, 1.0f,-1.0f,
-        1.0f,-1.0f,-1.0f,
-        1.0f, 1.0f, 1.0f,
-        1.0f,-1.0f, 1.0f,
-        1.0f, 1.0f, 1.0f,
-        1.0f, 1.0f,-1.0f,
-        -1.0f, 1.0f,-1.0f,
-        1.0f, 1.0f, 1.0f,
-        -1.0f, 1.0f,-1.0f,
-        -1.0f, 1.0f, 1.0f,
-        1.0f, 1.0f, 1.0f,
-        -1.0f, 1.0f, 1.0f,
-        1.0f,-1.0f, 1.0f
-    };
+private:
+
+    std::string getDataFile(const std::string& filename);
+
+    GLuint VAO;
+    // This will identify our vertex buffer
+    GLuint _programID, _textureID;
+
+    GLuint VBO, VBO2, VBO3 ,EBO;
+
+    ShaderProgram *_shader;
 };
 
 #endif
