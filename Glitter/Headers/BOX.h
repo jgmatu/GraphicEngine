@@ -8,10 +8,10 @@
 
 //N�mero de v�rtices
 const int cubeNVertex = 24; // 4 v�rtices x 6 caras
-const int cubeNTriangleIndex = 12; // 2 tri�ngulos por cara x  6 cara;
+const int cubeNTriangleIndex = 12; // 2 tri�ngulos por cara x 6 caras;
 
-const unsigned int cubeTriangleIndex[] = {
-	//Cara z = 1
+const std::vector<GLuint> cubeTriangleIndex = {
+    //Cara z = 1
 	0,1,2, 1,3,2,
 	//Cara z = -1
 	4,6,5, 5,6,7,
@@ -25,8 +25,8 @@ const unsigned int cubeTriangleIndex[] = {
 	20,22,21, 21,22,23,
 };
 
-//Posic�on de los vertices
-const GLfloat cubeVertexPos[] = {
+//Posicion de los vertices
+const std::vector<GLfloat> cubeVertexPos = {
 	//Cara z = 1
 	-1.0f,	-1.0f,	 1.0f, //0
 	 1.0f,	-1.0f,	 1.0f, //1
@@ -66,7 +66,7 @@ const GLfloat cubeVertexPos[] = {
 
 
 //Normal de los vertices
-const GLfloat cubeVertexNormal[] = {
+const std::vector<GLfloat> cubeVertexNormal = {
 	//Cara z = 1
 	0.0f,	0.0f,	 1.0f,
 	0.0f,	0.0f,	 1.0f,
@@ -147,7 +147,7 @@ const GLfloat cubeVertexColor[] = {
  };
 
 //Cood. de textura de los vertices
-const GLfloat cubeVertexTexCoord[] = {
+const std::vector<GLfloat> cubeVertexTexCoord = {
 	//Cara z = 1
 	 0.0f, 0.0f,
 	 1.0f, 0.0f,
