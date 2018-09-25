@@ -26,6 +26,7 @@ file(GLOB VENDORS_SOURCES Glitter/Vendor/glad/src/glad.c)
 file(GLOB PROJECT_HEADERS
     Glitter/Headers/ShaderProgram.hpp
     Glitter/Headers/Component.hpp
+    Glitter/Headers/Sphere.hpp
     Glitter/Headers/Triangle.hpp
     Glitter/Headers/Camera.hpp
     Glitter/Headers/Scene.hpp
@@ -34,6 +35,7 @@ file(GLOB PROJECT_HEADERS
 file(GLOB PROJECT_SOURCES
     Glitter/Sources/ShaderProgram.cpp
     Glitter/Sources/Component.cpp
+    Glitter/Sources/Sphere.cpp
     Glitter/Sources/Triangle.cpp
     Glitter/Sources/Camera.cpp
     Glitter/Sources/Scene.cpp

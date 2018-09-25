@@ -18,13 +18,14 @@ public:
     void init();
     void render();
 
-
     void add(Component *component);
 
 private:
 
     void demo(float angle);
+
     void setup_cubes();
+    void setup_spheres();
 
     Camera *_camera;
     GLFWwindow *_window;
