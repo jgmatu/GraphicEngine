@@ -19,92 +19,47 @@ static void keyCallback(GLFWwindow* window, int key, int scancode, int action, i
     }
 }
 
-void Scene::setup_cubes() {
-    const unsigned static NUM_CUBES = 3;
-    std::vector<Component*> cubes = std::vector<Component*>(NUM_CUBES);
-
-    for (int i = 0; i < 3; ++i) {
-        cubes[i] = new Component();
-
-        cubes[i]->setVertexPos(cubeVertexPos);
-        cubes[i]->setVertexNormal(cubeVertexNormal);
-        cubes[i]->setVertexTexCoord(cubeVertexTexCoord);
-        cubes[i]->setTriangleIndex(cubeTriangleIndex, cubeNTriangleIndex);
-
-        cubes[i]->vertexArrayID();
-        cubes[i]->genVertexBufferPosition();
-        cubes[i]->genVertexBufferNormal();
-        cubes[i]->genVertexBufferTextCoord();
-        cubes[i]->genVertexBufferIndex();
-    }
-    cubes[0]->shader("./Glitter/GLSL/cube/vertex.glsl", "./Glitter/GLSL/cube/fragment.glsl");
-    cubes[1]->shader("./Glitter/GLSL/cube/vertex.glsl", "./Glitter/GLSL/cube/fragment.glsl");
-    cubes[2]->shader("./Glitter/GLSL/cube/vertex.glsl", "./Glitter/GLSL/cube/fragment.glsl");
-
-    for (unsigned i = 0; i < NUM_CUBES; ++i) {
-        cubes[i]->createUniform("projection");
-        cubes[i]->createUniform("view");
-        cubes[i]->createUniform("model");
-        cubes[i]->createUniform("diffuseTexture");
-    }
-
-    cubes[0]->loadTexture("./texture2.png");
-    cubes[1]->loadTexture("./sun.png");
-    cubes[2]->loadTexture("./parallax4.png");
-
-    for (unsigned i = 0; i < NUM_CUBES; ++i) {
-        this->add(cubes[i]);
-    }
+void Scene::add(Component *component) {
+    _components.insert(std::pair<const unsigned int, Component*>(_ncomponent++, component));
 }
 
-void Scene::setup_spheres() {
-    static const unsigned NUM_SPHERES = 3;
+void Scene::setup_visitor() {
     Sphere *buffer = new Sphere();
     buffer->createBuffer();
 
-    std::vector<Component*> spheres = std::vector<Component*>(NUM_SPHERES);
+    for (unsigned i = 0; i < 3; ++i) {
+        Component *c = new Component(_camera);
 
-    for (unsigned i = 0; i < NUM_SPHERES; ++i) {
-        spheres[i] = new Component();
+        c->setVertexPos(buffer->getPosVertex());
+        c->setVertexNormal(buffer->getNormals());
+        c->setVertexTexCoord(buffer->getTexCoords());
+        c->setTriangleIndex(buffer->getIndexes(), buffer->getIndexes().size());
+        c->shader("./Glitter/GLSL/cube/vertex.glsl", "./Glitter/GLSL/cube/fragment.glsl");
 
-        spheres[i]->setVertexPos(buffer->getPosVertex());
-        spheres[i]->setVertexNormal(buffer->getNormals());
-        spheres[i]->setVertexTexCoord(buffer->getTexCoords());
-        spheres[i]->setTriangleIndex(buffer->getIndexes(), buffer->getIndexes().size());
-
-        spheres[i]->vertexArrayID();
-        spheres[i]->genVertexBufferPosition();
-        spheres[i]->genVertexBufferNormal();
-        spheres[i]->genVertexBufferTextCoord();
-        spheres[i]->genVertexBufferIndex();
-    }
-    spheres[0]->shader("./Glitter/GLSL/cube/vertex.glsl", "./Glitter/GLSL/cube/fragment.glsl");
-    spheres[1]->shader("./Glitter/GLSL/cube/vertex.glsl", "./Glitter/GLSL/cube/fragment.glsl");
-    spheres[2]->shader("./Glitter/GLSL/cube/vertex.glsl", "./Glitter/GLSL/cube/fragment.glsl");
-
-    for (unsigned i = 0; i < NUM_SPHERES; ++i) {
-        spheres[i]->createUniform("projection");
-        spheres[i]->createUniform("view");
-        spheres[i]->createUniform("model");
-        spheres[i]->createUniform("diffuseTexture");
-    }
-
-    spheres[0]->loadTexture("./parallax4.png");
-    spheres[1]->loadTexture("./sun.png");
-    spheres[2]->loadTexture("./texture3.png");
-
-    for (unsigned i = 0; i < NUM_SPHERES; ++i) {
-        this->add(spheres[i]);
+        if (i == 0) {
+            c->loadTexture("./parallax4.png");
+        }
+        if (i == 1) {
+            c->loadTexture("./sun.png");
+        }
+        if (i == 2) {
+            c->loadTexture("./texture3.png");
+        }
+        c->_tf->_x = i * 1.5;
+        c->_tf->_y = i * 1.5;
+        c->_tf->_z = 0;
+        this->add(c);
     }
 }
+
 
 void Scene::setup() {
-//    setup_cubes();
-    setup_spheres();
-}
+    setup_visitor();
 
-void Scene::add(Component *component) {
-        _components.insert(std::pair<const unsigned int, Component*>(_ncomponent++, component));
+    VisitStart start;
+    for (std::map<unsigned, Component*>::const_iterator it = _components.begin(); it != _components.end(); ++it) {
+        it->second->accept(start);
+    }
 }
 
 void Scene::init() {
@@ -138,44 +93,23 @@ void Scene::init() {
     gladLoadGL();
 }
 
-void Scene::demo(float angle) {
-    const static unsigned NUM_CUBES = 3;
-    std::vector<Component*> components = std::vector<Component*>(NUM_CUBES);
 
-    for (unsigned i = 0; i < NUM_CUBES; ++i) {
-        components[i] = _components[i];
-    }
-    for (int i = -2; i < 3; ++i) {
-        for (int j = -2; j < 3; ++j) {
-            unsigned ncomponent = abs(i + j) % NUM_CUBES;
-            components[ncomponent]->translate(glm::vec3(i * 3.5 , j * 3.5, 0.0));
-            components[ncomponent]->rotate(angle, glm::vec3(1.0f, -1.0f, 0.0f));
+void Scene::demo() {
+    VisitAwakeStart awakeStart;
+    VisitUpdate update;
 
-            components[ncomponent]->setUniform("projection", _camera->_projection);
-            components[ncomponent]->setUniform("view", _camera->_view);
-            components[ncomponent]->setUniform("model", components[ncomponent]->_model);
-            components[ncomponent]->setUniform("diffuseTexture", 0); // El índice es el mismo que en glActiveTexture()
-
-            // Render...
-            components[ncomponent]->bind();
-            components[ncomponent]->texture();
-            components[ncomponent]->draw();
-            components[ncomponent]->identity();
-        }
+    for (std::map<unsigned, Component*>::const_iterator it = _components.begin(); it != _components.end(); ++it) {
+        it->second->accept(awakeStart);
+        it->second->accept(update);
     }
 }
 
 void Scene::render() {
     glEnable(GL_DEPTH_TEST);
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-    GLint64 timer;
     do {
-        glGetInteger64v(GL_TIMESTAMP, &timer);
-        float angle = std::fmod((timer / 1000000000.0), (2.0f * M_PI));
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        demo(angle);
-
+        demo();
         // Poll for window events. The key callback above will only be
         // invoked during this call.
         glfwPollEvents();
@@ -183,29 +117,3 @@ void Scene::render() {
 
     } while (!glfwWindowShouldClose(_window));
 }
-
-/*
-std::vector<Cube*> cubes = std::vector<Cube*>(NUM_CUBES);
-for (int i = 0; i < 3; ++i) {
-    cubes[i] = new Cube();
-    cubes[i]->vertexArrayID();
-    cubes[i]->genVertexBufferPosition();
-    cubes[i]->genVertexBufferNormal();
-    cubes[i]->genVertexBufferTextCoord();
-    cubes[i]->genVertexBufferIndex();
-}
-cubes[0]->shader("./Glitter/GLSL/cube/vertex_1.glsl", "./Glitter/GLSL/cube/fragment_1.glsl");
-cubes[1]->shader("./Glitter/GLSL/cube/vertex_2.glsl", "./Glitter/GLSL/cube/fragment_2.glsl");
-cubes[2]->shader("./Glitter/GLSL/cube/vertex_3.glsl", "./Glitter/GLSL/cube/fragment_3.glsl");
-
-for (unsigned i = 0; i < NUM_CUBES; ++i) {
-    cubes[i]->createUniform("projection");
-    cubes[i]->createUniform("view");
-    cubes[i]->createUniform("model");
-    cubes[i]->createUniform("diffuseTexture");
-}
-
-cubes[0]->loadTexutre("./textura.png");
-cubes[1]->loadTexutre("./sun.png");
-cubes[2]->loadTexutre("./moon.png");
-*/

@@ -1,8 +1,10 @@
 #include "Component.hpp"
 #include <stb_image.h>
 
-Component::Component() {
-    _shader = new ShaderProgram();
+Component::Component(Camera *camera) {
+    _shader = new Shader();
+    _tf = new Transform();
+    _camera = camera;
 }
 
 Component::~Component() {
@@ -84,9 +86,9 @@ void Component::genVertexBufferIndex() {
     glBindVertexArray(0); // Unbind the VAO.
 }
 
-void Component::shader(std::string vertex, std::string fragment) {
-    _shader->createVertexShader(getDataFile(vertex));
-    _shader->createFragmentShader(getDataFile(fragment));
+void Component::shader() {
+    _shader->createVertexShader(getDataFile(_vertex));
+    _shader->createFragmentShader(getDataFile(_fragment));
     _shader->link();
     _programID = _shader->getProgramId();
 }
@@ -114,4 +116,49 @@ void Component::texture() {
 
 void Component::bind() {
     glUseProgram(_programID);
+}
+
+void Component::start() {
+    this->vertexArrayID();
+    this->genVertexBufferPosition();
+    this->genVertexBufferNormal();
+    this->genVertexBufferTextCoord();
+    this->genVertexBufferIndex();
+    this->shader();
+
+    this->createUniform("projection");
+    this->createUniform("view");
+    this->createUniform("model");
+    this->createUniform("diffuseTexture");
+}
+
+static GLint64 getTime() {
+    GLint64 timer;
+
+    glGetInteger64v(GL_TIMESTAMP, &timer);
+    return timer;
+}
+
+static float getAngle() {
+    return std::fmod((getTime() / 1000000000.0), (2.0f * M_PI));
+}
+
+void Component::awakeStart() {
+    _tf->translate(glm::vec3(_tf->_x, _tf->_y, _tf->_z));
+    _tf->rotate(getAngle(), glm::vec3(1.0f, -1.0f, 0.0f));
+
+    this->setUniform("projection", _camera->_projection);
+    this->setUniform("view", _camera->_view);
+    this->setUniform("model", _tf->model());
+    this->setUniform("diffuseTexture", 0); // El índice es el mismo que en glActiveTexture()
+
+    // Render...
+    this->bind();
+    this->texture();
+    this->draw();
+}
+
+void Component::update() {
+    this->_tf->identity();
+    this->_tf->move();
 }

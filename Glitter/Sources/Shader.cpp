@@ -1,39 +1,39 @@
-#include "ShaderProgram.hpp"
+#include "Shader.hpp"
 
-ShaderProgram::ShaderProgram() {
+Shader::Shader() {
       programId = glCreateProgram();
 
       if (programId == 0) {
-            std::cerr << "ShaderProgram failed" << std::endl;
+            std::cerr << "Shader failed" << std::endl;
       }
       vertexShaderId = 0;
       fragmentShaderId = 0;
 }
 
-ShaderProgram::~ShaderProgram() {
+Shader::~Shader() {
       ;
 }
 
 void
-ShaderProgram::createVertexShader(const std::string& sc) {
+Shader::createVertexShader(const std::string& sc) {
       this->vertexName = sc;
       vertexShaderId = createShader(sc, GL_VERTEX_SHADER);
 }
 
 void
-ShaderProgram::createFragmentShader(const std::string& sc) {
+Shader::createFragmentShader(const std::string& sc) {
       this->fragmentName = sc;
       vertexShaderId = createShader(sc, GL_FRAGMENT_SHADER);
 }
 
 void
-ShaderProgram::bind() { glUseProgram(programId); }
+Shader::bind() { glUseProgram(programId); }
 
 void
-ShaderProgram::unbind() { glUseProgram(0); }
+Shader::unbind() { glUseProgram(0); }
 
 void
-ShaderProgram::cleanup() {
+Shader::cleanup() {
       unbind();
       if (programId != 0) {
             glDeleteProgram(programId);
@@ -41,7 +41,7 @@ ShaderProgram::cleanup() {
 }
 
 void
-ShaderProgram::createUniform(std::string uniformName) {
+Shader::createUniform(std::string uniformName) {
       int uniformLocation = glGetUniformLocation(programId, uniformName.c_str());
 
       if (uniformLocation < 0) {
@@ -55,22 +55,22 @@ ShaderProgram::createUniform(std::string uniformName) {
 }
 
 void
-ShaderProgram::setUniform(std::string name, glm::vec3 value) {
+Shader::setUniform(std::string name, glm::vec3 value) {
       glUniform3f(uniforms[name], value.x, value.y, value.z);
 }
 
 void
-ShaderProgram::setUniform(std::string name, glm::mat4 matrix) {
+Shader::setUniform(std::string name, glm::mat4 matrix) {
       glUniformMatrix4fv(uniforms[name], 1, GL_FALSE,  glm::value_ptr(matrix));
 }
 
 void
-ShaderProgram::setUniform(std::string name, int value) {
+Shader::setUniform(std::string name, int value) {
       glUniform1i(uniforms[name], value);
 }
 
 int
-ShaderProgram::createShader(const std::string& sc, int shaderType) {
+Shader::createShader(const std::string& sc, int shaderType) {
     int params;
 
     const char* _sc = sc.c_str();
@@ -100,7 +100,7 @@ ShaderProgram::createShader(const std::string& sc, int shaderType) {
 }
 
 void
-ShaderProgram::link() {
+Shader::link() {
       int params;
       char inflog[1024];
       int size;

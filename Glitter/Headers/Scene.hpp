@@ -5,6 +5,7 @@
 
 #include "Camera.hpp"
 #include "Component.hpp"
+#include "Visitor.hpp"
 
 class Scene {
 
@@ -22,10 +23,13 @@ public:
 
 private:
 
-    void demo(float angle);
+    void demo();
+
+    void demo_visitor();
 
     void setup_cubes();
     void setup_spheres();
+    void setup_visitor();
 
     Camera *_camera;
     GLFWwindow *_window;

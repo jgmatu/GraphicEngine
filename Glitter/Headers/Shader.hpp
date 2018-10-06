@@ -15,12 +15,12 @@
 #include <map>
 
 
-class ShaderProgram {
+class Shader {
 
 public:
 
-    ShaderProgram();
-    ~ShaderProgram();
+    Shader();
+    ~Shader();
     void createVertexShader(const std::string& sc);
     void createFragmentShader(const std::string& sc);
     void link();

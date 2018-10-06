@@ -3,7 +3,6 @@
 
 #define GLM_ENABLE_EXPERIMENTAL
 
-#include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/gtx/transform.hpp> // after <glm/glm.hpp>
@@ -11,6 +10,7 @@
 class Camera {
 
 public:
+
     Camera();
     ~Camera();
 
@@ -18,7 +18,7 @@ public:
     glm::mat4 _projection;
 
 private:
-    
+
     const float aspectRatio = 4.0f / 3.0f;
 
 };

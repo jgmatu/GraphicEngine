@@ -10,46 +10,69 @@
 #include <glm/glm.hpp>
 #include <glm/gtx/transform.hpp> // after <glm/glm.hpp>
 
-#include "ShaderProgram.hpp"
+#include "Element.hpp"
+#include "Shader.hpp"
+#include "Transform.hpp"
+#include "Camera.hpp"
 
-class Component {
+class Component: public Element {
 
 public:
 
-    Component();
+    Component(Camera *camera);
     ~Component();
 
-    void setVertexPos(std::vector<GLfloat> vertexPos) {
+    void setVertexPos(const std::vector<GLfloat> vertexPos) {
         this->_vertexPos = vertexPos;
     };
 
-    void setVertexNormal(std::vector<GLfloat> vertexNormal) {
+    void setVertexNormal(const std::vector<GLfloat> vertexNormal) {
         this->_vertexNormal = vertexNormal;
     };
 
-    void setVertexTexCoord(std::vector<GLfloat> vertexTexCoord) {
+    void setVertexTexCoord(const std::vector<GLfloat> vertexTexCoord) {
         this->_vertexTexCoord = vertexTexCoord;
     };
 
-    void setTriangleIndex(std::vector<GLuint> triangleIndex, unsigned NTriangleIndex) {
+    void setTriangleIndex(const std::vector<GLuint> triangleIndex, const unsigned NTriangleIndex) {
         this->_triangleIndex = triangleIndex;
         this->_NTriangleIndex = NTriangleIndex;
     };
 
-    void vertexArrayID();
+    void loadTexture(const char *filename);
 
+    void shader(std::string vertex, std::string fragment) {
+        this->_vertex = vertex;
+        this->_fragment = fragment;
+    };
+
+    // Metodo para empezar con el patrón de diseño
+    void accept(class Visitor &v);
+
+    // Método que se llama cada vez que el Componente se activa.
+    void awakeStart();
+
+    // Este método SOLO se llama una vez la primera vez que se crea el componente.
+    void start();
+
+    // Método que realiza transformaciones, cálculos de cosas.
+    void update();
+
+    Transform *_tf;
+
+private:
+
+    void vertexArrayID();
     void genVertexBufferPosition();
     void genVertexBufferNormal();
     void genVertexBufferTextCoord();
     void genVertexBufferIndex();
 
-    void loadTexture(const char *filename);
-
-    void draw();
-    void bind();
-
-    void shader(std::string vertex, std::string fragment);
+    void shader();
     void texture();
+
+    void bind();
+    void draw();
 
     void createUniform(std::string name) {
         _shader->createUniform(name);
@@ -63,26 +86,6 @@ public:
         _shader->setUniform(name, value);
     }
 
-    glm::mat4 _model;
-
-    void identity() {
-        _model = glm::mat4(1.0);
-    }
-
-    void translate(glm::vec3 vec3) {
-        _model *= glm::translate(_model, vec3);
-    }
-
-    void scale(glm::vec3 vec3) {
-        _model *= glm::scale(_model, vec3);
-    }
-
-    void rotate(float angle, glm::vec3 direction) {
-        _model *= glm::rotate(angle, direction);
-    }
-
-protected:
-
     std::string getDataFile(const std::string& filename);
 
     // Active Buffer.
@@ -94,14 +97,17 @@ protected:
     // Vertices Buffers...
     GLuint VBO, VBO2, VBO3, EBO;
 
-    ShaderProgram *_shader;
-
     std::vector<GLfloat> _vertexPos;
     std::vector<GLfloat> _vertexNormal;
     std::vector<GLfloat> _vertexTexCoord;
     std::vector<GLuint> _triangleIndex;
     int _NTriangleIndex;
 
+    std::string _vertex;
+    std::string _fragment;
+
+    Shader *_shader;
+    Camera *_camera;
 };
 
 #endif
